@@ -1,5 +1,3 @@
-Berikut adalah contoh kode README yang memberikan panduan tentang proyek CRUD "Members" menggunakan Laravel dan Vue.js.
-
 ---
 
 # Laravel Vue CRUD Members

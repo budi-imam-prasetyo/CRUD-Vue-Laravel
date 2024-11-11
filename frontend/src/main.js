@@ -1,18 +1,11 @@
-//import createApp from Vue
 import { createApp } from "vue";
-
-//import component App
 import App from "./App.vue";
-
-//import config router
 import router from "./router";
 import './style.css';
+import CardComponent from './components/card.vue'
 
-
-//create App Vue
 const app = createApp(App);
+app.component("CardComponent", CardComponent)
 
-//gunakan "router" di Vue dengan plugin "use"
 app.use(router);
-
 app.mount("#app");

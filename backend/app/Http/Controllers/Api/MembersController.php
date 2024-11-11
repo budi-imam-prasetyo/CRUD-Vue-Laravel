@@ -18,16 +18,18 @@ class MembersController extends Controller
             $query->withTrashed();
         }]);
 
+        // Handle search
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('address', 'like', "%{$search}%");
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('address', 'like', "%{$search}%");
             });
         }
 
+        // Handle filters
         if ($request->has('gender')) {
             $query->where('gender', $request->gender);
         }
@@ -36,7 +38,19 @@ class MembersController extends Controller
             $query->where('class_id', $request->class);
         }
 
-        if ($request->has('sort_by')) {
+        // Handle column sorting
+        if ($request->has('sort_column') && $request->has('sort_direction')) {
+            $sortColumn = $request->sort_column;
+            $sortDirection = $request->sort_direction;
+
+            // Whitelist kolom yang diizinkan untuk sorting
+            $allowedColumns = ['id', 'class_id', 'first_name', 'last_name', 'email', 'address', 'created_at'];
+
+            if (in_array($sortColumn, $allowedColumns)) {
+                $query->orderBy($sortColumn, $sortDirection);
+            }
+        } else if ($request->has('sort_by')) {
+            // Fallback ke sorting default jika tidak ada column sorting
             $sort = $request->sort_by === 'latest' ? 'desc' : 'asc';
             $query->orderBy('created_at', $sort);
         }
@@ -122,7 +136,7 @@ class MembersController extends Controller
     public function show($id)
     {
         try {
-            $member = Members::findOrFail($id);
+            $member = Members::with('class')->findOrFail($id);
 
             return response()->json($member);
         } catch (\Exception $e) {
